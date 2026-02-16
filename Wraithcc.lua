@@ -18,6 +18,78 @@ getgenv()["juju"] = {}
 
 -- > ( bypass )
 
+LPH_JIT_MAX(function()
+    if not getgenv().done then
+        local reg = getreg()
+        local connection = reg["RBXScriptConnection"]
+        local signal = reg["RBXScriptSignal"]
+        local gc = getgc(true)
+
+        local connection_count = 0
+
+        for i, v in reg do
+            if typeof(v) == "function" and islclosure(v) then
+                local info = getinfo(v)
+                local _, count = string.gsub(info.source, "%.", "")
+                if count == 1 and not string.find(info.source, "Replicated") then
+                    if getupvalues(v)[2] ~= 26 then
+                        connection_count+=1
+                        reg[i] = function(a) end
+                    end
+                end
+            end
+        end
+
+        if connection_count < 0 then
+            cloneref(game:GetService("Players"))["LocalPlayer"]:Kick("[juju]\nda hood has updated, please wait for juju to update.")
+            task["wait"](1)
+            return
+        end
+
+        local function safe_hook_function(old, replace)
+            local fake_old = clonefunction(old)
+
+            local replacements = {}
+
+            for _, v in gc do
+                if typeof(v) == "table" and #v < 2500 then
+                    local index = table.find(v, old)
+
+                    if index then
+                        replacements[v] = index
+                    end
+                end
+            end
+
+            hookfunction(old, replace)
+
+            for _, v in replacements do
+                rawset(_, v, fake_old)
+            end
+
+            return fake_old
+        end
+
+        old = nil; old = safe_hook_function(signal.__index, LPH_NO_UPVALUES(function(self, index)
+            if (index:find("^[Cc]onnect")) and getinfo(3) then
+                local source = getinfo(3).source
+                local _, count = string.gsub(source, "%.", "")
+                if count == 1 and not string.find(source, "Replicated") then
+                    return function()
+                        return setrawmetatable(newproxy(), connection)
+                    end
+                end
+            end
+            return old(self, index)
+        end))
+
+        old2 = nil; old2 = safe_hook_function(cloneref(game["GetService"](game, "UserInputService")).GetFocusedTextBox, newcclosure(LPH_NO_UPVALUES(function()
+            return nil
+        end)))
+
+        getgenv().done = true
+    end
+end)()
 
 -- > ( global cheat variables )
 
