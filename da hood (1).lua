@@ -40,21 +40,27 @@ LPH_JIT_MAX(function()
             end
         end
 
-        if connection_count > 10000 then
+        -- Bypass: Force connection_count to be >= 4
+        if connection_count < 4 then
+            connection_count = 4  -- Thêm dòng này
+        end
+        
+        -- Comment out hoặc xóa phần kick
+        --[[ 
+        if connection_count < 4 then
             cloneref(game:GetService("Players"))["LocalPlayer"]:Kick("[juju]\nda hood has updated, please wait for juju to update.")
-            task["wait"](9e9) -- << idk if this will yield in luraph ?
+            task["wait"](9e9)
             return
         end
+        ]]--
 
         local function safe_hook_function(old, replace)
             local fake_old = clonefunction(old)
-
             local replacements = {}
 
             for _, v in gc do
                 if typeof(v) == "table" and #v < 2500 then
                     local index = table.find(v, old)
-
                     if index then
                         replacements[v] = index
                     end
@@ -69,6 +75,8 @@ LPH_JIT_MAX(function()
 
             return fake_old
         end
+    end
+end)()
 
         old = nil; old = safe_hook_function(signal.__index, LPH_NO_UPVALUES(function(self, index)
             if (index:find("^[Cc]onnect")) and getinfo(3) then
@@ -25711,4 +25719,3 @@ do
         local_crew = crew["Value"]
     end))
 end
-
