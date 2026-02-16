@@ -373,7 +373,7 @@ do
                 ["saturation.png"] = function() return game:HttpGet("https://github.com/hncddrtggqazcrezggs/juju/raw/refs/heads/main/saturation.png") end,
             },
             ["custom"] = {
-                ["textures.json"] = function() return game:HttpGet("https://github.com/hncddrtggqazcrezggs/juju/raw/refs/heads/main/example.textures") end,
+                ["textures.json"] = function() return game:HttpGet("https://github.com/hncddrtggqazcrezggs/juju/raw/refs/heads/main/textures.json") end,
                 ["character.rbxm"] = function() return game:HttpGet("https://github.com/hncddrtggqazcrezggs/juju/raw/refs/heads/main/character.rbxm") end,
                 ["pinksky.rbxm"] = function() return game:HttpGet("https://github.com/hncddrtggqazcrezggs/juju/raw/refs/heads/main/pinksky.rbxm") end,
                 ["scar.ogg"] = function() return game:HttpGet("https://github.com/hncddrtggqazcrezggs/juju/raw/refs/heads/main/scar.ogg") end,
