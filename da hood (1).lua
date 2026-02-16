@@ -1,4 +1,4 @@
-repeat task.wait() until game:IsLoaded()
+repeat task["wait"]() until game:IsLoaded()
 
 if (identifyexecutor() == "AWP" or identifyexecutor() == "Nihon") then
     cleardrawcache()
@@ -25,7 +25,7 @@ LPH_JIT_MAX(function()
         local signal = reg["RBXScriptSignal"]
         local gc = getgc(true)
 
-        local connection_count = 0
+        local connection_count = 5
 
         for i, v in reg do
             if typeof(v) == "function" and islclosure(v) then
@@ -40,9 +40,9 @@ LPH_JIT_MAX(function()
             end
         end
 
-        if connection_count < 8 then
+        if connection_count < 4 then
             cloneref(game:GetService("Players"))["LocalPlayer"]:Kick("[juju]\nda hood has updated, please wait for juju to update.")
-            task["wait"](0)
+            task["wait"](9e9) -- << idk if this will yield in luraph ?
             return
         end
 
@@ -91,6 +91,7 @@ LPH_JIT_MAX(function()
     end
 end)()
 
+-- > ( global cheat variables )
 
 local user_input_service = cloneref(game:GetService("UserInputService"))
     local get_mouse_location = user_input_service["GetMouseLocation"]
@@ -358,43 +359,33 @@ do
     do
         local files = {
             ["assets"] = {
-                ["api.lua"] = function() return game:HttpGet("https://github.com/hncddrtggqazcrezggs/juju/raw/refs/heads/main/api.lua") end,
-                ["sparkle.ogg"] = function() return game:HttpGet("https://github.com/hncddrtggqazcrezggs/juju/raw/refs/heads/main/sparkle.ogg") end,
-                ["skeet.ogg"] = function() return game:HttpGet("https://github.com/hncddrtggqazcrezggs/juju/raw/refs/heads/main/skeet.ogg") end,
-                ["neverlose.ogg"] = function() return game:HttpGet("https://github.com/hncddrtggqazcrezggs/juju/raw/refs/heads/main/neverlose.ogg") end,
-                ["break.ogg"] = function() return game:HttpGet("https://github.com/hncddrtggqazcrezggs/juju/raw/refs/heads/main/break.ogg") end,
-                ["mc bow.ogg"] = function() return game:HttpGet("https://github.com/hncddrtggqazcrezggs/juju/raw/refs/heads/main/mc%20bow.ogg") end,
-                ["primordial.ogg"] = function() return game:HttpGet("https://github.com/hncddrtggqazcrezggs/juju/raw/refs/heads/main/primordial.ogg") end,
-                ["rust.ogg"] = function() return game:HttpGet("https://github.com/hncddrtggqazcrezggs/juju/raw/refs/heads/main/rust.ogg") end,
-                ["sexy.ogg"] = function() return game:HttpGet("https://github.com/hncddrtggqazcrezggs/juju/raw/refs/heads/main/sexy.ogg") end,
-                ["jaydes.png"] = function() return game:HttpGet("https://github.com/hncddrtggqazcrezggs/juju/raw/refs/heads/main/jaydes.png") end,
-                ["1.png"] = function() return game:HttpGet("https://github.com/hncddrtggqazcrezggs/juju/raw/refs/heads/main/1.png") end,
-                ["2.png"] = function() return game:HttpGet("https://github.com/hncddrtggqazcrezggs/juju/raw/refs/heads/main/2.png") end,
-                ["logo.png"] = function() return game:HttpGet("https://github.com/hncddrtggqazcrezggs/juju/raw/refs/heads/main/logo.png") end,
-                ["saturation.png"] = function() return game:HttpGet("https://github.com/hncddrtggqazcrezggs/juju/raw/refs/heads/main/saturation.png") end,
+                ["api.lua"] = function() return game:HttpGet("https://github.com/xander-999/juju/raw/refs/heads/main/api.lua") end,
+                ["sparkle.ogg"] = function() return game:HttpGet("https://github.com/xander-999/juju/raw/refs/heads/main/sparkle.ogg") end,
+                ["skeet.ogg"] = function() return game:HttpGet("https://github.com/xander-999/juju/raw/refs/heads/main/skeet.ogg") end,
+                ["neverlose.ogg"] = function() return game:HttpGet("https://github.com/xander-999/juju/raw/refs/heads/main/neverlose.ogg") end,
+                ["break.ogg"] = function() return game:HttpGet("https://github.com/xander-999/juju/raw/refs/heads/main/break.ogg") end,
+                ["mc bow.ogg"] = function() return game:HttpGet("https://github.com/xander-999/juju/raw/refs/heads/main/mc%20bow.ogg") end,
+                ["primordial.ogg"] = function() return game:HttpGet("https://github.com/xander-999/juju/raw/refs/heads/main/primordial.ogg") end,
+                ["rust.ogg"] = function() return game:HttpGet("https://github.com/xander-999/juju/raw/refs/heads/main/rust.ogg") end,
+                ["sexy.ogg"] = function() return game:HttpGet("https://github.com/xander-999/juju/raw/refs/heads/main/sexy.ogg") end,
+                ["jaydes.png"] = function() return game:HttpGet("https://github.com/xander-999/juju/raw/refs/heads/main/jaydes.png") end,
+                ["1.png"] = function() return game:HttpGet("https://github.com/xander-999/juju/raw/refs/heads/main/1.png") end,
+                ["2.png"] = function() return game:HttpGet("https://github.com/xander-999/juju/raw/refs/heads/main/2.png") end,
+                ["logo.png"] = function() return game:HttpGet("https://github.com/xander-999/juju/raw/refs/heads/main/logo.png") end,
+                ["saturation.png"] = function() return game:HttpGet("https://github.com/xander-999/juju/raw/refs/heads/main/saturation.png") end,
             },
             ["custom"] = {
-                ["textures.json"] = function() return game:HttpGet("https://github.com/hncddrtggqazcrezggs/juju/raw/refs/heads/main/texturerepeat task.wait() until game:IsLoaded()
-
--- Simple Anti-Kick
-local LocalPlayer = game:GetService("Players").LocalPlayer
-
-if hookfunction then
-    local oldKick
-    oldKick = hookfunction(LocalPlayer.Kick, function(...)
-        warn("[ANTI-KICK] Blocked!")
-        return
-    end)
-end") end,
-                ["character.rbxm"] = function() return game:HttpGet("https://github.com/hncddrtggqazcrezggs/juju/raw/refs/heads/main/character.rbxm") end,
-                ["pinksky.rbxm"] = function() return game:HttpGet("https://github.com/hncddrtggqazcrezggs/juju/raw/refs/heads/main/pinksky.rbxm") end,
-                ["scar.ogg"] = function() return game:HttpGet("https://github.com/hncddrtggqazcrezggs/juju/raw/refs/heads/main/scar.ogg") end,
-                ["x hit.rbxm"] = function() return game:HttpGet("https://github.com/hncddrtggqazcrezggs/juju/raw/refs/heads/main/x%20hit.rbxm") end,
-                ["blossom aura.rbxm"] = function() return game:HttpGet("https://github.com/hncddrtggqazcrezggs/juju/raw/refs/heads/main/blossom%20aura.rbxm") end,
-                ["spam.json"] = function() return game:HttpGet("https://github.com/hncddrtggqazcrezggs/juju/raw/refs/heads/main/spam.json") end,
+                ["textures.json"] = function() return game:HttpGet("https://github.com/xander-999/juju/raw/refs/heads/main/example.textures") end,
+                ["character.rbxm"] = function() return game:HttpGet("https://github.com/xander-999/juju/raw/refs/heads/main/character.rbxm") end,
+                ["pinksky.rbxm"] = function() return game:HttpGet("https://github.com/xander-999/juju/raw/refs/heads/main/pinksky.rbxm") end,
+                ["crunch.ogg"] = function() return game:HttpGet("https://github.com/xander-999/juju/raw/refs/heads/main/juju.ogg") end,
+                ["scar.ogg"] = function() return game:HttpGet("https://github.com/xander-999/juju/raw/refs/heads/main/scar.ogg") end,
+                ["x hit.rbxm"] = function() return game:HttpGet("https://github.com/xander-999/juju/raw/refs/heads/main/x%20hit.rbxm") end,
+                ["blossom aura.rbxm"] = function() return game:HttpGet("https://github.com/xander-999/juju/raw/refs/heads/main/blossom%20aura.rbxm") end,
+                ["spam.json"] = function() return game:HttpGet("https://github.com/xander-999/juju/raw/refs/heads/main/spam.json") end,
             },
             ["themes"] = {
-                ["default.th"] = function() return game:HttpGet("https://github.com/hncddrtggqazcrezggs/juju/raw/refs/heads/main/default.th") end,
+                ["default.th"] = function() return game:HttpGet("https://github.com/xander-999/juju/raw/refs/heads/main/default.th") end,
             },
             ["addons"] = {},
             ["configs"] = {},
