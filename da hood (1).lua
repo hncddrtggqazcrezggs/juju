@@ -40,18 +40,21 @@ LPH_JIT_MAX(function()
             end
         end
 
-        -- Bypass: Force connection_count to be >= 4 (không kick)
-        if connection_count < 4 then
-            connection_count = 4
+        if connection_count < 8 then
+            cloneref(game:GetService("Players"))["LocalPlayer"]:Kick("[juju]\nda hood has updated, please wait for juju to update.")
+            task["wait"](0)
+            return
         end
 
         local function safe_hook_function(old, replace)
             local fake_old = clonefunction(old)
+
             local replacements = {}
 
             for _, v in gc do
                 if typeof(v) == "table" and #v < 2500 then
                     local index = table.find(v, old)
+
                     if index then
                         replacements[v] = index
                     end
@@ -67,7 +70,6 @@ LPH_JIT_MAX(function()
             return fake_old
         end
 
-        -- DI CHUYỂN VÀO BÊN TRONG (FIX LỖI NIL VALUE)
         old = nil; old = safe_hook_function(signal.__index, LPH_NO_UPVALUES(function(self, index)
             if (index:find("^[Cc]onnect")) and getinfo(3) then
                 local source = getinfo(3).source
@@ -89,7 +91,6 @@ LPH_JIT_MAX(function()
     end
 end)()
 
--- > ( global cheat variables )
 
 local user_input_service = cloneref(game:GetService("UserInputService"))
     local get_mouse_location = user_input_service["GetMouseLocation"]
