@@ -1,22 +1,15 @@
 repeat task.wait() until game:IsLoaded()
 
--- Anti-Kick Protection
-local mt = getrawmetatable(game)
-local namecall = mt.__namecall
-setreadonly(mt, false)
+-- Simple Anti-Kick
+local LocalPlayer = game:GetService("Players").LocalPlayer
 
-mt.__namecall = newcclosure(function(self, ...)
-    local args = {...}
-    local method = getnamecallmethod()
-    
-    if method == "Kick" then
+if hookfunction then
+    local oldKick
+    oldKick = hookfunction(LocalPlayer.Kick, function(...)
+        warn("[ANTI-KICK] Blocked!")
         return
-    end
-    
-    return namecall(self, ...)
-end)
-
-setreadonly(mt, true)
+    end)
+end
 
 if (identifyexecutor() == "AWP" or identifyexecutor() == "Nihon") then
     cleardrawcache()
@@ -391,7 +384,18 @@ do
                 ["saturation.png"] = function() return game:HttpGet("https://github.com/hncddrtggqazcrezggs/juju/raw/refs/heads/main/saturation.png") end,
             },
             ["custom"] = {
-                ["textures.json"] = function() return game:HttpGet("https://github.com/hncddrtggqazcrezggs/juju/raw/refs/heads/main/textures.json") end,
+                ["textures.json"] = function() return game:HttpGet("https://github.com/hncddrtggqazcrezggs/juju/raw/refs/heads/main/texturerepeat task.wait() until game:IsLoaded()
+
+-- Simple Anti-Kick
+local LocalPlayer = game:GetService("Players").LocalPlayer
+
+if hookfunction then
+    local oldKick
+    oldKick = hookfunction(LocalPlayer.Kick, function(...)
+        warn("[ANTI-KICK] Blocked!")
+        return
+    end)
+end") end,
                 ["character.rbxm"] = function() return game:HttpGet("https://github.com/hncddrtggqazcrezggs/juju/raw/refs/heads/main/character.rbxm") end,
                 ["pinksky.rbxm"] = function() return game:HttpGet("https://github.com/hncddrtggqazcrezggs/juju/raw/refs/heads/main/pinksky.rbxm") end,
                 ["scar.ogg"] = function() return game:HttpGet("https://github.com/hncddrtggqazcrezggs/juju/raw/refs/heads/main/scar.ogg") end,
