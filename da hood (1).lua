@@ -1,26 +1,21 @@
 repeat task.wait() until game:IsLoaded()
 
--- Bypass Kick
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-
-local mt = getrawmetatable(game)
-local oldNamecall = mt.__namecall
-setreadonly(mt, false)
-
-mt.__namecall = newcclosure(function(self, ...)
-    local method = getnamecallmethod()
-    local args = {...}
+-- Universal Anti-Kick
+pcall(function()
+    local mt = getrawmetatable(game)
+    local oldNamecall = mt.__namecall
+    setreadonly(mt, false)
     
-    if method == "Kick" or method == "kick" then
-        warn("[ANTI-KICK] Blocked kick attempt!")
-        return
+    mt.__namecall = function(self, ...)
+        local method = getnamecallmethod()
+        if method == "Kick" then
+            return
+        end
+        return oldNamecall(self, ...)
     end
     
-    return oldNamecall(self, ...)
+    setreadonly(mt, true)
 end)
-
-setreadonly(mt, true)
 
 if (identifyexecutor() == "AWP" or identifyexecutor() == "Nihon") then
     cleardrawcache()
