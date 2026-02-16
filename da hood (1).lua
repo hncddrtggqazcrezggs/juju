@@ -1,6 +1,4 @@
-getgenv().done = true
 repeat task["wait"]() until game:IsLoaded()
-
 
 if (identifyexecutor() == "AWP" or identifyexecutor() == "Nihon") then
     cleardrawcache()
@@ -42,19 +40,10 @@ LPH_JIT_MAX(function()
             end
         end
 
-        -- Bypass: Force connection_count to be >= 4
+        -- Bypass: Force connection_count to be >= 4 (không kick)
         if connection_count < 4 then
-            connection_count = 4  -- Thêm dòng này
+            connection_count = 4
         end
-        
-        -- Comment out hoặc xóa phần kick
-        --[[ 
-        if connection_count < 4 then
-            cloneref(game:GetService("Players"))["LocalPlayer"]:Kick("[juju]\nda hood has updated, please wait for juju to update.")
-            task["wait"](9e9)
-            return
-        end
-        ]]--
 
         local function safe_hook_function(old, replace)
             local fake_old = clonefunction(old)
@@ -77,9 +66,8 @@ LPH_JIT_MAX(function()
 
             return fake_old
         end
-    end
-end)()
 
+        -- DI CHUYỂN VÀO BÊN TRONG (FIX LỖI NIL VALUE)
         old = nil; old = safe_hook_function(signal.__index, LPH_NO_UPVALUES(function(self, index)
             if (index:find("^[Cc]onnect")) and getinfo(3) then
                 local source = getinfo(3).source
@@ -98,8 +86,8 @@ end)()
         end)))
 
         getgenv().done = true
-    end
-end)()
+    end  -- KẾT THÚC if not getgenv().done
+end)()  -- KẾT THÚC LPH_JIT_MAX
 
 -- > ( global cheat variables )
 
