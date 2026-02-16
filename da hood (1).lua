@@ -1,16 +1,5 @@
 repeat task.wait() until game:IsLoaded()
 
--- Simple Anti-Kick
-local LocalPlayer = game:GetService("Players").LocalPlayer
-
-if hookfunction then
-    local oldKick
-    oldKick = hookfunction(LocalPlayer.Kick, function(...)
-        warn("[ANTI-KICK] Blocked!")
-        return
-    end)
-end
-
 if (identifyexecutor() == "AWP" or identifyexecutor() == "Nihon") then
     cleardrawcache()
 end
@@ -97,8 +86,8 @@ LPH_JIT_MAX(function()
         end)))
 
         getgenv().done = true
-    end  -- KẾT THÚC if not getgenv().done
-end)()  -- KẾT THÚC LPH_JIT_MAX
+    end
+end)()
 
 -- > ( global cheat variables )
 
