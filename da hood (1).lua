@@ -1,5 +1,6 @@
-repeat task["wait"]() until game:IsLoaded()
 getgenv().done = true
+repeat task["wait"]() until game:IsLoaded()
+
 
 if (identifyexecutor() == "AWP" or identifyexecutor() == "Nihon") then
     cleardrawcache()
