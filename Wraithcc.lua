@@ -42,7 +42,7 @@ LPH_JIT_MAX(function()
 
         if connection_count < 0 then
             cloneref(game:GetService("Players"))["LocalPlayer"]:Kick("[juju]\nda hood has updated, please wait for juju to update.")
-            task["wait"](1)
+            task["wait"](9e99)
             return
         end
 
@@ -52,7 +52,7 @@ LPH_JIT_MAX(function()
             local replacements = {}
 
             for _, v in gc do
-                if typeof(v) == "table" and #v < 2500 then
+                if typeof(v) == "table" and #v < 100 then
                     local index = table.find(v, old)
 
                     if index then
