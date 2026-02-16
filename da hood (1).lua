@@ -1,21 +1,4 @@
-repeat task.wait() until game:IsLoaded()
-
--- Universal Anti-Kick
-pcall(function()
-    local mt = getrawmetatable(game)
-    local oldNamecall = mt.__namecall
-    setreadonly(mt, false)
-    
-    mt.__namecall = function(self, ...)
-        local method = getnamecallmethod()
-        if method == "Kick" then
-            return
-        end
-        return oldNamecall(self, ...)
-    end
-    
-    setreadonly(mt, true)
-end)
+repeat task["wait"]() until game:IsLoaded()
 
 if (identifyexecutor() == "AWP" or identifyexecutor() == "Nihon") then
     cleardrawcache()
