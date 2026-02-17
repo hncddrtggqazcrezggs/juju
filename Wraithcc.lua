@@ -39,9 +39,7 @@ LPH_JIT_MAX(function()
         local connection_count = 0
         local patched_functions = {}
 
-        -- ===============================================
-        -- IMPROVED SAFE HOOK với stealth mode
-        -- ===============================================
+
         local function stealth_hook(original, replacement)
             if patched_functions[original] then
                 return patched_functions[original]
@@ -87,7 +85,7 @@ LPH_JIT_MAX(function()
                 return original
             end
             
-            -- Restore references với delay nhỏ
+
             task.spawn(function()
                 for tbl, idx in pairs(refs) do
                     pcall(function()
@@ -100,9 +98,6 @@ LPH_JIT_MAX(function()
             return cloned
         end
 
-        -- ===============================================
-        -- ADVANCED ANTICHEAT DETECTION & BYPASS
-        -- ===============================================
         local suspicious_patterns = {
             "AC", "Anti", "Cheat", "Detect", "Ban", "Kick", 
             "Monitor", "Check", "Verify", "Validate", "Security"
@@ -111,29 +106,29 @@ LPH_JIT_MAX(function()
         local function is_anticheat(source)
             if not source then return false end
             
-            -- Check patterns
+            
             for _, pattern in ipairs(suspicious_patterns) do
                 if source:match(pattern) then
                     return true
                 end
             end
             
-            -- Check dot count (original method)
+
             local _, dots = source:gsub("%.", "")
             return dots == 1 and not source:find("Replicated")
         end
         
-        -- Patch registry functions với validation
+        
         for i, v in pairs(reg) do
             if typeof(v) == "function" and islclosure(v) then
                 local success, info = pcall(getinfo, v)
                 if success and info then
                     if is_anticheat(info.source) then
                         local upvals = getupvalues(v)
-                        -- Dynamic check thay vì hardcode 26
+          
                         if upvals and upvals[2] and typeof(upvals[2]) == "number" and upvals[2] < 50 then
                             connection_count = connection_count + 1
-                            -- Thay bằng dummy function
+                            
                             reg[i] = newcclosure(function() end)
                         end
                     end
@@ -141,22 +136,15 @@ LPH_JIT_MAX(function()
             end
         end
         
-        -- Validation check - nếu quá ít/nhiều connection thì cảnh báo
         if connection_count < 1 or connection_count > 100 then
             warn(string.format("[Bypass] Unusual connection count: %d - Game may have updated", connection_count))
-            -- Không kick ngay, chỉ warn
         end
-
-        -- ===============================================
-        -- SIGNAL HOOKS - Bypass Connect detection
-        -- ===============================================
         local signal_old
         signal_old = stealth_hook(signal.__index, newcclosure(LPH_NO_UPVALUES(function(self, key)
             -- Kiểm tra Connect/connect
             if tostring(key):lower():match("^connect") then
                 local caller = getinfo(3)
                 if caller and is_anticheat(caller.source) then
-                    -- Return fake connection
                     return newcclosure(function(...)
                         local proxy = newproxy(true)
                         getmetatable(proxy).__index = function() 
@@ -169,77 +157,54 @@ LPH_JIT_MAX(function()
             return signal_old(self, key)
         end)))
 
-        -- ===============================================
-        -- INPUT HOOKS - Bypass textbox detection
-        -- ===============================================
         local uis_old
         uis_old = stealth_hook(services.UIS.GetFocusedTextBox, newcclosure(function(...)
-            -- Luôn return nil để fake không có textbox focused
             return nil
         end))
         
-        -- Hook thêm IsKeyDown để tránh input detection
         pcall(function()
             local iskeydown_old = services.UIS.IsKeyDown
             stealth_hook(iskeydown_old, newcclosure(function(self, key, ...)
-                -- Cho phép bình thường nhưng log nếu cần
                 return iskeydown_old(self, key, ...)
             end))
         end)
 
-        -- ===============================================
-        -- NAMECALL HOOK - Layer bảo vệ cuối cùng
-        -- ===============================================
         local old_namecall
         old_namecall = hookmetamethod(game, "__namecall", newcclosure(function(self, ...)
             local method = getnamecallmethod()
             local args = {...}
             
-            -- Block kick attempts
             if method == "Kick" and self == LocalPlayer then
                 return
             end
             
-            -- Block FireServer từ anticheat
             if method == "FireServer" or method == "InvokeServer" then
                 local caller = getinfo(2)
                 if caller and is_anticheat(caller.source) then
-                    return -- Block
+                    return
                 end
             end
             
             return old_namecall(self, ...)
         end))
-
-        -- ===============================================
-        -- HEARTBEAT MONITOR - Phát hiện runtime checks
-        -- ===============================================
         task.spawn(function()
             local last_check = tick()
             services.RS.Heartbeat:Connect(function()
                 local now = tick()
-                if now - last_check > 5 then -- Check mỗi 5s
-                    -- Verify bypass vẫn hoạt động
+                if now - last_check > 5 then
                     if not getgenv().wraith_bypass_v2 then
                         warn("[Bypass] Bypass has been cleared! Re-applying...")
-                        -- Re-run bypass nếu bị clear
                     end
                     last_check = now
                 end
             end)
         end)
-
-        -- ===============================================
-        -- FINALIZE
-        -- ===============================================
         getgenv().wraith_bypass_v2 = {
             active = true,
             timestamp = tick(),
             connections_patched = connection_count,
             version = "2.0"
         }
-        
-        -- Success message
         task.wait(0.5)
         print(string.format(
             "[Wraith Bypass v2.0]\n✓ Patched %d connections\n✓ Hooked %d functions\n✓ Status: Active", 
@@ -529,7 +494,7 @@ do
                 ["jaydes.png"] = function() return game:HttpGet("https://github.com/hncddrtggqazcrezggs/juju/raw/refs/heads/main/jaydes.png") end,
                 ["1.png"] = function() return game:HttpGet("https://github.com/hncddrtggqazcrezggs/juju/raw/refs/heads/main/1.png") end,
                 ["2.png"] = function() return game:HttpGet("https://github.com/hncddrtggqazcrezggs/juju/raw/refs/heads/main/2.png") end,
-                ["logo.png"] = function() return game:HttpGet("https://github.com/hncddrtggqazcrezggs/juju/raw/refs/heads/main/1771256411661.png") end,
+                ["logo.png"] = function() return game:HttpGet("https://github.com/hncddrtggqazcrezggs/juju/raw/refs/heads/main/logo.png") end,
                 ["saturation.png"] = function() return game:HttpGet("https://github.com/hncddrtggqazcrezggs/juju/raw/refs/heads/main/saturation.png") end,
             },
             ["custom"] = {
@@ -890,7 +855,7 @@ do
     local juju_text = drawing_proxy["new"]("Text", {
         ["Font"] = 1,
         ["Color"] = color3_fromrgb(255, 255, 255),
-        ["Text"] = "Wraith",
+        ["Text"] = "juju",
         ["Parent"] = logo,
         ["Position"] = udim2_new(1, 5, 0, 3),
         ["Size"] = 14,
@@ -901,7 +866,7 @@ do
     local build_text = drawing_proxy["new"]("Text", {
         ["Font"] = 1,
         ["Color"] = menu["colors"]["accent"],
-        ["Text"] = (LRM_ScriptName == "da hood" or LRM_ScriptName == "da hood copies") and "live" or "cc",
+        ["Text"] = (LRM_ScriptName == "da hood" or LRM_ScriptName == "da hood copies") and "private" or "live",
         ["Parent"] = logo,
         ["Position"] = udim2_new(1, 5, 0, 19),
         ["Size"] = 14,
@@ -25869,3 +25834,4 @@ do
         local_crew = crew["Value"]
     end))
 end
+
