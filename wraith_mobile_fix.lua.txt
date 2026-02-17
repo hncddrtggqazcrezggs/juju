@@ -1,0 +1,191 @@
+-- ========================================
+-- WRAITH CC - MOBILE & LEGITBOT QUICK FIX
+-- Chạy script này TRƯỚC khi load Wraithcc.lua
+-- ========================================
+
+print("[Wraith Fix] Loading fixes...")
+
+-- Phát hiện mobile
+local UserInputService = game:GetService("UserInputService")
+local isMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
+
+getgenv().wraith_mobile_mode = isMobile
+getgenv().wraith_fix_applied = true
+
+print("[Wraith Fix] Mobile mode:", isMobile and "YES" or "NO")
+
+-- Hook create_section để fix legitbot tab position
+local original_sections = {}
+
+-- Delay để hook sau khi menu được tạo
+task.spawn(function()
+    task.wait(3) -- Đợi UI load
+    
+    -- Tìm menu object
+    local menu = getgenv().juju and getgenv().juju.menu or _G.menu
+    
+    if menu and menu.groups and menu.groups.main then
+        print("[Wraith Fix] Found menu, applying fixes...")
+        
+        -- FIX 1: Legitbot section visibility
+        task.wait(1)
+        
+        -- Try to find and fix legitbot section
+        for name, group in pairs(menu.groups) do
+            if typeof(group) == "table" then
+                for i, v in pairs(group) do
+                    if typeof(v) == "table" and tostring(i):lower():find("legit") then
+                        print("[Wraith Fix] Found legitbot section:", i)
+                        
+                        -- Force visible
+                        if typeof(v) == "Instance" and v.Visible ~= nil then
+                            v.Visible = true
+                        end
+                        
+                        -- Fix position if needed
+                        if typeof(v) == "Instance" and v.Position then
+                            -- Move to visible area
+                            v.Position = UDim2.new(0, 10, 0, 10)
+                            print("[Wraith Fix] Repositioned legitbot section")
+                        end
+                    end
+                end
+            end
+        end
+    end
+end)
+
+-- FIX 2: Mobile touch drag support
+if isMobile then
+    print("[Wraith Fix] Enabling mobile touch controls...")
+    
+    task.spawn(function()
+        task.wait(3)
+        
+        -- Find menu frame
+        local menu_frame = nil
+        
+        for _, obj in pairs(game:GetService("CoreGui"):GetDescendants()) do
+            if obj:IsA("Frame") and (obj.Name:lower():find("menu") or obj.Name:lower():find("wraith")) then
+                menu_frame = obj
+                break
+            end
+        end
+        
+        if not menu_frame then
+            -- Try in PlayerGui
+            for _, obj in pairs(game:GetService("Players").LocalPlayer.PlayerGui:GetDescendants()) do
+                if obj:IsA("Frame") and (obj.Name:lower():find("menu") or obj.Name:lower():find("wraith")) then
+                    menu_frame = obj
+                    break
+                end
+            end
+        end
+        
+        if menu_frame then
+            print("[Wraith Fix] Found menu frame:", menu_frame.Name)
+            
+            local dragging = false
+            local dragInput = nil
+            local dragStart = nil
+            local startPos = nil
+            
+            -- Touch started
+            menu_frame.InputBegan:Connect(function(input)
+                if input.UserInputType == Enum.UserInputType.Touch then
+                    dragging = true
+                    dragInput = input
+                    dragStart = input.Position
+                    startPos = menu_frame.Position
+                    
+                    print("[Wraith Fix] Touch drag started")
+                end
+            end)
+            
+            -- Touch moved
+            game:GetService("UserInputService").InputChanged:Connect(function(input)
+                if input == dragInput and dragging then
+                    local delta = input.Position - dragStart
+                    menu_frame.Position = UDim2.new(
+                        startPos.X.Scale,
+                        startPos.X.Offset + delta.X,
+                        startPos.Y.Scale,
+                        startPos.Y.Offset + delta.Y
+                    )
+                end
+            end)
+            
+            -- Touch ended
+            game:GetService("UserInputService").InputEnded:Connect(function(input)
+                if input == dragInput then
+                    dragging = false
+                    dragInput = nil
+                    print("[Wraith Fix] Touch drag ended")
+                end
+            end)
+            
+            print("[Wraith Fix] Touch drag enabled successfully!")
+        else
+            warn("[Wraith Fix] Could not find menu frame for touch controls")
+        end
+    end)
+end
+
+-- FIX 3: Debug legitbot tab content
+task.spawn(function()
+    task.wait(5) -- Đợi UI load hoàn toàn
+    
+    print("=====================================")
+    print("[Wraith Fix] Legitbot Tab Debug Info")
+    print("=====================================")
+    
+    -- Check menu_references
+    if getgenv().menu_references then
+        local refs = getgenv().menu_references
+        
+        if refs.legitbot_settings_section then
+            print("✓ Legitbot section exists")
+            
+            local section = refs.legitbot_settings_section
+            print("  - Type:", typeof(section))
+            
+            if typeof(section) == "Instance" then
+                print("  - Name:", section.Name)
+                print("  - Visible:", section.Visible)
+                print("  - Position:", section.Position)
+                print("  - Size:", section.Size)
+                print("  - Parent:", section.Parent and section.Parent.Name or "nil")
+                
+                -- Count children
+                local count = 0
+                for _ in pairs(section:GetChildren()) do
+                    count = count + 1
+                end
+                print("  - Children count:", count)
+                
+                if count == 0 then
+                    warn("  ! No children found - section is EMPTY")
+                    print("  ! Possible causes:")
+                    print("    1. Section created but elements failed to add")
+                    print("    2. Y position might be wrong (0.57)")
+                    print("    3. Tab might not be properly initialized")
+                end
+            end
+        else
+            warn("✗ Legitbot section NOT found!")
+            print("  Available sections:")
+            for name, _ in pairs(refs) do
+                if name:lower():find("section") then
+                    print("    -", name)
+                end
+            end
+        end
+    else
+        warn("✗ menu_references not found!")
+    end
+    
+    print("=====================================")
+end)
+
+print("[Wraith Fix] All fixes queued successfully")
+print("Now load your Wraithcc.lua script")
