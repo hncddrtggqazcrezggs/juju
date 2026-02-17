@@ -7847,7 +7847,7 @@ do
                 misc:create_tab("Addons")
                 misc:create_tab("Shop")
                 misc:create_tab("Main")
-            menu.create_group("Addons")
+            menu.create_group("addons")
             menu["groups"]["addons"]:hide()
         end
 
