@@ -7833,21 +7833,21 @@ do
 
         do
             local main = menu.create_group("main")
-                main:create_tab("ragebot")
-                main:create_tab("legitbot")
+                main:create_tab("Rage bot")
+                main:create_tab("Legit bot")
 
             local visuals = menu.create_group("visuals")
-                visuals:create_tab("players")
-                visuals:create_tab("general")
-                visuals:create_tab("skins")
+                visuals:create_tab("Character")
+                visuals:create_tab("General")
+                visuals:create_tab("Skins")
 
            local misc = menu.create_group("misc.")
-                misc:create_tab("players")
-                misc:create_tab("configs")
-                misc:create_tab("addons")
-                misc:create_tab("shop")
-                misc:create_tab("main")
-            menu.create_group("addons")
+                misc:create_tab("Player")
+                misc:create_tab("Configs")
+                misc:create_tab("Addons")
+                misc:create_tab("Shop")
+                misc:create_tab("Main")
+            menu.create_group("Addons")
             menu["groups"]["addons"]:hide()
         end
 
