@@ -7848,7 +7848,7 @@ do
                 misc:create_tab("shop")
                 misc:create_tab("main")
             menu.create_group("addons")
-            menu["groups"]["addons"]
+            menu["groups"]["addons"]:hide()
         end
 
         menu_references["addon_list"] = menu["groups"]["misc."]:create_panel_section("addons", "addon list", 1, 1, 0)
