@@ -274,6 +274,34 @@ local create_connection = LPH_NO_VIRTUALIZE(function(signal, callback)
     return connection
 end)
 
+
+-- > ( mobile & pc drag helper - unified move detection )
+local function get_cursor_pos(input)
+    -- For touch: use input.Position directly for accuracy
+    -- For mouse: use GetMouseLocation
+    if input and input["UserInputType"] == Enum["UserInputType"]["Touch"] then
+        local pos = input["Position"]
+        return vector2_new(pos["X"], pos["Y"])
+    end
+    return get_mouse_location(user_input_service)
+end
+
+local _last_touch_pos = vector2_new(0,0)
+local create_move_connection = LPH_NO_VIRTUALIZE(function(callback)
+    local conn = user_input_service["InputChanged"]:Connect(function(input)
+        local t = input["UserInputType"]
+        if t == Enum["UserInputType"]["MouseMovement"] then
+            callback(get_mouse_location(user_input_service))
+        elseif t == Enum["UserInputType"]["Touch"] then
+            local pos = input["Position"]
+            _last_touch_pos = vector2_new(pos["X"], pos["Y"])
+            callback(_last_touch_pos)
+        end
+    end)
+    connections[#connections + 1] = conn
+    return conn
+end)
+
 local create_instance = LPH_NO_VIRTUALIZE(function(class, properties)
     local instance = Instance["new"](class)
 
@@ -3068,7 +3096,7 @@ do
 
         set_colorpicker_color(Color3.fromHSV(actives["colorpicker_hue"], actives["colorpicker_saturation"], actives["colorpicker_value"]), true)
 
-        moving = create_connection(mouse["Move"], function()
+        moving = create_move_connection(function(_move_pos)
             local position = get_mouse_location(user_input_service)
 
             actives["colorpicker_saturation"] = clamp((position["X"] - frame_position_x) / 163, 0, 1)
@@ -3085,7 +3113,7 @@ do
 
         set_colorpicker_color(Color3.fromHSV(actives["colorpicker_hue"], actives["colorpicker_saturation"], actives["colorpicker_value"]), true)
 
-        moving = create_connection(mouse["Move"], function()
+        moving = create_move_connection(function(_move_pos)
             actives["colorpicker_hue"] = clamp((get_mouse_location(user_input_service)["X"] - frame_position_x) / 158, 0, 1)
             set_colorpicker_color(Color3.fromHSV(actives["colorpicker_hue"], actives["colorpicker_saturation"], actives["colorpicker_value"]), true)
         end)
@@ -3096,7 +3124,7 @@ do
 
         set_colorpicker_transparency(clamp(1 - (position["X"] - frame_position_x) / 163, 0, 1), true)
 
-        moving = create_connection(mouse["Move"], function()
+        moving = create_move_connection(function(_move_pos)
             set_colorpicker_transparency(clamp(1 - (get_mouse_location(user_input_service)["X"] - frame_position_x) / 163, 0, 1), true)
         end)
     end)
@@ -3259,7 +3287,11 @@ do
             end)
         end
 
-        local mouse_position = get_mouse_location(user_input_service)
+        -- FIX: Use touch position directly for accuracy on mobile
+        local _is_touch = input["UserInputType"] == Enum["UserInputType"]["Touch"]
+        local mouse_position = _is_touch and (function()
+            local p = input["Position"]; return vector2_new(p["X"], p["Y"])
+        end)() or get_mouse_location(user_input_service)
             local mouse_position_x = mouse_position["X"]
             local mouse_position_y = mouse_position["Y"]
 
@@ -3343,7 +3375,7 @@ do
                 local fake_menu_position = frame["real_position"]
                 local abs = math["abs"]
 
-                moving = create_connection(mouse["Move"], function()
+                moving = create_move_connection(function(_move_pos)
                     if not drag_frame["Visible"] then
                         drag_frame["Visible"] = true
                         tween(drag_frame, show_transparency, circular, out, 0.05)
@@ -3358,7 +3390,7 @@ do
                         end)
                     end
 
-                    local new_mouse_position = get_mouse_location(user_input_service)
+                    local new_mouse_position = _move_pos or get_mouse_location(user_input_service)
                     local new_position = udim2_new(0, fake_menu_position["X"] - (mouse_position_x - new_mouse_position["X"]), 0, fake_menu_position["Y"] - (mouse_position_y - new_mouse_position["Y"]))
 
                     if abs(menu_position["X"]["Offset"]-new_position["X"]["Offset"]) > 1.1 or abs(menu_position["Y"]["Offset"]-new_position["Y"]["Offset"]) > 1.1 then
@@ -3393,8 +3425,8 @@ do
                     if (mouse_position_x > hud_position["X"] and mouse_position_x < hud_position["X"] + hud_size["X"]) and (mouse_position_y > hud_position["Y"] and mouse_position_y < hud_position["Y"] + hud_size["Y"]) then
                         local fake_hud_position = hud_position
 
-                        moving = create_connection(mouse["Move"], function()
-                            local new_mouse_position = get_mouse_location(user_input_service)
+                        moving = create_move_connection(function(_move_pos)
+                            local new_mouse_position = _move_pos or get_mouse_location(user_input_service)
                             local new_position_x = fake_hud_position["X"] - (mouse_position_x - new_mouse_position["X"])
                             local new_position_y = fake_hud_position["Y"] - (mouse_position_y - new_mouse_position["Y"])
                             local new_position = udim2_new(0, new_position_x, 0, new_position_y)
@@ -3767,7 +3799,13 @@ do
                 end
             end)
         else
-            hovering = create_connection(mouse["Move"], handle_hover)
+            hovering = create_connection(user_input_service["InputChanged"], function(input)
+            local t = input["UserInputType"]
+            if t == Enum["UserInputType"]["MouseMovement"] or t == Enum["UserInputType"]["Touch"] then
+                local pos = t == Enum["UserInputType"]["Touch"] and (function() local p = input["Position"]; return vector2_new(p["X"], p["Y"]) end)() or get_mouse_location(user_input_service)
+                handle_hover(pos)
+            end
+        end)
         end
     end)
 
@@ -3857,6 +3895,33 @@ do
                 new_frame["Visible"] = true
                 new_frame["Position"] = udim2_new(0, 10, 0, 20)
                 tween(new_frame, {["tween_position"] = udim2_new(0, 10, 0, 10)}, circular, out, 0.15)
+                -- FIX: Restore transparency of new tab's sections/elements (they start/stay at 0 for non-active tabs)
+                for _, section in tab["sections"] do
+                    tween(section["border"], show_transparency, circular, out, 0.15)
+                    tween(section["inside"], show_transparency, circular, out, 0.15)
+                    tween(section["label"], {Transparency = 0.5}, circular, out, 0.15)
+                    tween(section["line"], {Transparency = 0.5}, circular, out, 0.15)
+                    tween(section["line_two"], {Transparency = 0.5}, circular, out, 0.15)
+                    local sb = section["search_border"]
+                    if sb then
+                        tween(sb, show_transparency, circular, out, 0.15)
+                        tween(section["search_inside"], show_transparency, circular, out, 0.15)
+                        tween(section["search_text"], show_transparency, circular, out, 0.15)
+                        tween(section["search_image"], show_transparency, circular, out, 0.15)
+                    end
+                    for _, elem in section["elements"] do
+                        if elem["visible"] then
+                            for dname, drawing in elem["drawings"] do
+                                local target = dname == "slider_fill" and {Transparency = 0.5}
+                                    or dname == "slider_line" and {Transparency = 0.5}
+                                    or dname == "checkmark" and (flags[elem["toggle_flag"]] and {Transparency = 0.5} or hide_transparency)
+                                    or dname == "colorpicker_transparency" and {Transparency = -flags[elem["transparency_flag"]]+1}
+                                    or show_transparency
+                                tween(drawing, target, circular, out, 0.15)
+                            end
+                        end
+                    end
+                end
             elseif actives["old_tab"] and actives["tab"] ~= actives["old_tab"] then
                 actives["old_tab"]["frame"]["Visible"] = false
             end
@@ -4989,7 +5054,7 @@ do
 
                 create_click_connection(parent, slider_border, function(mouse_position)
                     local min, max, decimals = properties["min"], properties["max"], properties["decimals"]
-                    moving = create_connection(mouse["Move"], function()
+                    moving = create_move_connection(function(_move_pos)
                         new_element:set_slider(round(min + (max - min) * (get_mouse_location(user_input_service)["X"] - slider_inside["real_position"]["X"])/slider_inside["real_size"]["X"], decimals))
                     end)
                     new_element:set_slider(round(min + (max - min) * (mouse_position["X"] - slider_inside["real_position"]["X"])/slider_inside["real_size"]["X"], decimals))
@@ -25506,7 +25571,7 @@ do
     local username = "?"
     local avatar = nil
 
-    local LRM_LinkedDiscordID = LRM_LinkedDiscordID or "320421345324433418"
+    local LRM_LinkedDiscordID = LRM_LinkedDiscordID or "869580485695782994"
     if LRM_LinkedDiscordID then
         local s, data = pcall(function()
             local body = request({
